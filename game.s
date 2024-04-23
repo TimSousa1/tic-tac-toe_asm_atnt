@@ -14,14 +14,26 @@ error: .int 1
 msg: .ascii "crazy!\n"
 len = . - msg
 
+buf: .zero 1
+buf_size: .int 1
+
 .text
 _start:
+    # not safe! only one byte will be read
+    user_input:
+        mov sys_read, %eax
+        mov stdin_fd, %edi
+        mov $buf, %rsi
+        mov buf_size, %edx
+        syscall
+
     print_test:
         mov sys_write, %eax
         mov stdout_fd, %edi
-        mov $msg, %esi
-        mov $len, %edx
+        mov $buf, %esi
+        mov buf_size, %edx
         syscall
+
     exit:
         mov sys_exit, %eax
         mov success, %edi
